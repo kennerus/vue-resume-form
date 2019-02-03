@@ -75,13 +75,21 @@ export default {
   border-color: #b00020;
 }
 
-.invalid {
+.invalid,
+.main .invalid .mdc-textfield .mdc-text-field__input {
   color: #b00020;
   caret-color: #b00020;
 }
 
-.invalid::placeholder {
+.invalid::placeholder,
+.main .invalid .mdc-textfield .mdc-text-field__input,
+.main .invalid .mdc-textfield .mdc-text-field__input::placeholder  {
   color: #b00020;
+}
+
+.main .invalid .mdc-line-ripple--active {
+  border-bottom-color: #b00020;
+  background-color: #b00020;
 }
 
 .swal2-popup .swal2-title {

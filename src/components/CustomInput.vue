@@ -6,8 +6,12 @@
       :fullwidth="isFullWidth"
       :multiline="isMultiLine"
       :rows="rows"
-      :required="isRequired"
+      :class="{'invalid': isRequired && !isValid && !isFormReady}"
     ></mdc-textfield>
+    <mdc-caption
+      v-if="isRequired && !isValid && !isFormReady"
+      :class="{'invalid': isRequired && !isValid && !isFormReady}"
+    >{{errorText}}</mdc-caption>
   </mdc-layout-cell>
 </template>
 <script>
@@ -41,6 +45,18 @@ export default {
     isRequired: {
       type: Boolean,
       default: false
+    },
+    isValid: {
+      type: Boolean,
+      default: false
+    },
+    isFormReady: {
+      type: Boolean,
+      default: true
+    },
+    errorText: {
+      type: String,
+      default: "Заполните поле."
     }
   },
   data() {

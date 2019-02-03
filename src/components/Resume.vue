@@ -5,18 +5,22 @@
     @dragleave.prevent="dragSwitcher"
   >
     <mdc-layout-grid class="content">
-      <mdc-layout-cell span="8">
+      <mdc-layout-cell span="8" ref="validatingEl">
         <mdc-layout-inner-grid>
           <CustomInput
             @emitText="getInputText"
             keyIndex="post"
             label="Должность"
             :isRequired="true"
+            :isValid="isPostValid"
+            :isFormReady="isFormReady"
+            errorText="Введите название должности. Минимум 4 символа."
+            ref="post"
           />
 
           <CustomInput @emitText="getInputText" keyIndex="city" label="Город"/>
 
-          <mdc-layout-cell span="12">
+          <mdc-layout-cell span="12" ref="employmentType">
             <EmploymentType @employmentTypes="getInputText" :isFormReady="isFormReady"/>
           </mdc-layout-cell>
 
@@ -26,7 +30,7 @@
 
       <mdc-layout-cell span="4">
         <mdc-layout-inner-grid>
-          <mdc-layout-cell span="12">
+          <mdc-layout-cell span="11">
             <div
               class="drop"
               @dragover.prevent
@@ -48,9 +52,11 @@
         </mdc-layout-inner-grid>
       </mdc-layout-cell>
 
-      <mdc-layout-cell span="12">
+      <mdc-layout-cell span="12" ref="categories">
         <mdc-title :class="{'invalid': !this.isCategoryValid && !this.isFormReady}">Категории</mdc-title>
-        <mdc-caption :class="{'invalid': !this.isCategoryValid && !this.isFormReady}">Выберите хотя бы одну категорию</mdc-caption>
+        <mdc-caption
+          :class="{'invalid': !this.isCategoryValid && !this.isFormReady}"
+        >Выберите хотя бы одну категорию</mdc-caption>
 
         <v-select
           id="v-select"
@@ -290,8 +296,36 @@ export default {
       if (this.isRequiredFiledsValid) {
         this.isFormReady = true;
       } else {
+        let firstItemOffsetTop = 0;
+        if (this.nonValidFieldsNames.length > 1) {
+          const minOffsetFieldName = this.nonValidFieldsNames.reduce(
+            (prev, current) =>
+              this.$refs[prev].$el.offsetTop < this.$refs[current].$el.offsetTop
+                ? prev
+                : current
+          );
+          firstItemOffsetTop =
+            this.$refs[minOffsetFieldName].$el.offsetTop - 70;
+        } else if (this.nonValidFieldsNames.length === 1) {
+          firstItemOffsetTop =
+            this.$refs[this.nonValidFieldsNames].$el.offsetTop - 70;
+        }
         this.isFormReady = false;
-        this.$swal(`Заполните поля: ${this.nonValidFieldsNames}`, "", "error");
+        window.scrollTo({
+            top: firstItemOffsetTop,
+            behavior: 'smooth'
+          })
+
+        // this.$swal(
+        //   `Заполните поля: ${this.nonValidFieldsTitles}`,
+        //   "",
+        //   "error"
+        // ).then(() =>
+        //   window.scrollTo({
+        //     top: firstItemOffsetTop,
+        //     behavior: "smooth"
+        //   })
+        // );
       }
     },
     setRequiredFieldsStatus(fieldName, isValid) {
@@ -329,19 +363,25 @@ export default {
     nonValidFields() {
       return this.requiredFields.filter(field => !field.isValid);
     },
-    nonValidFieldsNames() {
+    nonValidFieldsTitles() {
       return this.nonValidFields.map(field => field.title);
+    },
+    nonValidFieldsNames() {
+      return this.nonValidFields.map(field => field.name);
     }
   },
   watch: {
     post() {
-      this.setRequiredFieldsStatus('post', this.isPostValid);
+      this.setRequiredFieldsStatus("post", this.isPostValid);
     },
     selectedCategories() {
-      this.setRequiredFieldsStatus('categories', this.isCategoryValid);
+      this.setRequiredFieldsStatus("categories", this.isCategoryValid);
     },
     employmentType() {
-      this.setRequiredFieldsStatus('employmentType', this.isEmploymentTypeValid);
+      this.setRequiredFieldsStatus(
+        "employmentType",
+        this.isEmploymentTypeValid
+      );
     }
   }
 };
@@ -445,6 +485,7 @@ input[type="file"] {
 
 .drop label {
   margin-bottom: 0;
+  text-align: center;
 }
 </style>
 

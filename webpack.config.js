@@ -5,7 +5,6 @@ const webpack = require('webpack');
 module.exports = {
   entry: {
     main: './src/pages/index/main.js',
-    another: './src/pages/another/another.js'
   },
   module: {
     rules: [{
@@ -33,14 +32,6 @@ module.exports = {
       chunks: ['main', "vendor", "manifest"],
       template: './src/pages/index/index.html',
       filename: 'index.html',
-      chunksSortMode: 'dependency',
-    }),
-    new HtmlWebpackPlugin({
-      inject: true,
-      title: 'Another',
-      chunks: ['another', "vendor", "manifest"],
-      template: './src/pages/another/another.html',
-      filename: 'another.html',
       chunksSortMode: 'dependency',
     }),
     new VueLoaderPlugin(),
