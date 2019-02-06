@@ -69,38 +69,6 @@
       </mdc-layout-cell>
 
       <mdc-layout-cell span="12">
-        <WorkExperience
-          v-for="experience in experience"
-          :key="experience.keyIndex"
-          :haveTitle="experience.haveTitle"
-          :keyIndex="experience.keyIndex"
-          @experienceData="getExperienceData"
-        />
-        <mdc-button
-          type="button"
-          @click="addExperience"
-          :disabled="experience.length > 5"
-          raised
-        >Добавить ещё одно место работы</mdc-button>
-      </mdc-layout-cell>
-
-      <mdc-layout-cell span="12">
-        <Education
-          v-for="education in education"
-          :key="education.keyIndex"
-          :haveTitle="education.haveTitle"
-          :keyIndex="education.keyIndex"
-          @educationData="getEducationData"
-        />
-        <mdc-button
-          type="button"
-          @click="addEducation"
-          :disabled="education.length > 5"
-          raised
-        >Добавить ещё одно образование</mdc-button>
-      </mdc-layout-cell>
-
-      <mdc-layout-cell span="12">
         <mdc-title>Навыки</mdc-title>
 
         <v-select
@@ -110,6 +78,48 @@
           :options="selectedSkills.length < 4 ? skills: []"
           v-on:input="skillsLimiter"
         ></v-select>
+      </mdc-layout-cell>
+
+      <mdc-layout-cell span="12">
+        <mdc-button type="button" @click="isExperienceHidden = !isExperienceHidden" outlined>{{experienceToggleText}}</mdc-button>
+        <mdc-layout-cell v-if="!isExperienceHidden">
+          <WorkExperience
+            v-for="experience in experience"
+            :key="experience.keyIndex"
+            :title="experience.haveTitle"
+            :removeBtn="experience.removeBtn"
+            :keyIndex="experience.keyIndex"
+            @experienceIndex="removeExperience"
+            @experienceData="getExperienceData"
+          />
+          <mdc-button
+            type="button"
+            @click="addExperience"
+            :disabled="experience.length > 5"
+            raised
+          >Добавить ещё одно место работы</mdc-button>
+        </mdc-layout-cell>
+      </mdc-layout-cell>
+
+      <mdc-layout-cell span="12">
+        <mdc-button type="button" @click="isEducationHidden = !isEducationHidden" outlined>{{educationToggleText}}</mdc-button>
+        <mdc-layout-cell v-if="!isEducationHidden">
+          <Education
+            v-for="education in education"
+            :key="education.keyIndex"
+            :title="education.haveTitle"
+            :removeBtn="education.removeBtn"
+            :keyIndex="education.keyIndex"
+            @educationIndex="removeEducation"
+            @educationData="getEducationData"
+          />
+          <mdc-button
+            type="button"
+            @click="addEducation"
+            :disabled="education.length > 5"
+            raised
+          >Добавить ещё одно образование</mdc-button>
+        </mdc-layout-cell>
       </mdc-layout-cell>
 
       <CustomInput
@@ -147,7 +157,8 @@ export default {
       selectedCategories: [],
       experience: [
         {
-          haveTitle: true,
+          title: "Опыт работы",
+          removeBtn: false,
           keyIndex: 0,
           company: "",
           city: "",
@@ -158,7 +169,8 @@ export default {
       ],
       education: [
         {
-          haveTitle: true,
+          title: "Образование",
+          removeBtn: false,
           keyIndex: 0,
           university: "",
           city: "",
@@ -167,6 +179,8 @@ export default {
           description: ""
         }
       ],
+      isEducationHidden: false,
+      isExperienceHidden: false,
       skills: ["CSS", "HTML", "JS", "VueJs", "ReactJs", "AngularJs"],
       selectedSkills: [],
       additionalInfo: "",
@@ -212,7 +226,8 @@ export default {
           : this.lastExperienceIndex.keyIndex + 1;
 
       this.experience.push({
-        haveTitle: false,
+        title: "Дополнительный опыт",
+        removeBtn: true,
         keyIndex,
         company: "",
         city: "",
@@ -220,6 +235,11 @@ export default {
         period: "",
         duties: ""
       });
+    },
+    removeExperience(index) {
+      this.experience = this.experience.filter(
+        experience => experience.keyIndex !== index
+      );
     },
     getEducationData(data) {
       this.education[data.keyIndex].university = data.education.university;
@@ -233,8 +253,10 @@ export default {
         this.education.length > 1
           ? this.educationIndex + 1
           : this.educationIndex.keyIndex + 1;
+
       this.education.push({
-        haveTitle: false,
+        title: "Дополнительное образование",
+        removeBtn: true,
         keyIndex,
         university: "",
         city: "",
@@ -242,6 +264,11 @@ export default {
         period: "",
         description: ""
       });
+    },
+    removeEducation(index) {
+      this.education = this.education.filter(
+        education => education.keyIndex !== index
+      );
     },
     categoryLimiter(e) {
       if (e.length > 4) {
@@ -312,9 +339,9 @@ export default {
         }
         this.isFormReady = false;
         window.scrollTo({
-            top: firstItemOffsetTop,
-            behavior: 'smooth'
-          })
+          top: firstItemOffsetTop,
+          behavior: "smooth"
+        });
 
         // this.$swal(
         //   `Заполните поля: ${this.nonValidFieldsTitles}`,
@@ -368,6 +395,12 @@ export default {
     },
     nonValidFieldsNames() {
       return this.nonValidFields.map(field => field.name);
+    },
+    educationToggleText() {
+      return this.isEducationHidden ? 'Развернуть образование' : 'Свернуть образование'
+    },
+    experienceToggleText() {
+      return this.isExperienceHidden ? 'Развернуть опыт работы' : 'Свернуть опыт работы'
     }
   },
   watch: {

@@ -18,6 +18,10 @@ export default {
 </script>
 
 <style>
+.mr15 {
+  margin-right: 15px;
+}
+
 .main .mdc-text-field--fullwidth .mdc-text-field__input {
   resize: none;
 }
