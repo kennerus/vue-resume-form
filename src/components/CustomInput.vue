@@ -1,7 +1,8 @@
 <template>
   <mdc-layout-cell :span="cells">
     <mdc-textfield
-      v-model="text"
+      :value="text"
+      @input="emitText($event.target.value)"
       :label="label"
       :fullwidth="isFullWidth"
       :multiline="isMultiLine"
@@ -64,14 +65,15 @@ export default {
       text: ""
     };
   },
-  watch: {
-    text(value) {
-      this.$emit("emitText", {
+  methods: {
+    emitText(value) {
+      this.text = value;
+       this.$emit("emitText", {
         value,
         keyIndex: this.keyIndex
       });
     }
-  }
+  },
 };
 </script>
 
